@@ -1,0 +1,19 @@
+{
+    "manifest_version": 3,
+    "name": "YouTube Custom Subtitles",
+    "version": "1.0",
+    "description": "Add and sync custom subtitles to YouTube videos.",
+    "permissions": ["activeTab", "scripting"],
+    "action": {
+        "default_popup": "popup.html"
+    },
+    "background": {
+        "service_worker": "background.js"
+    },
+    "content_scripts": [
+        {
+            "matches": ["*://www.youtube.com/*"],
+            "js": ["content.js"]
+        }
+    ]
+}
