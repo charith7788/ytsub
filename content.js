@@ -1,6 +1,7 @@
 /*
     Title   :   Custom Youtube Subtitle
-    Version :   1.0.0 (initial version)
+    Version :   1.0.1 (updated 2025/02/14)
+    Description: Add and sync custom subtitles (SRT format) to YouTube videos.
     Author  :   Charitha Dayantha
     Country :   Sri Lanka
     Github  :   https://github.com/charith7788
@@ -9,7 +10,7 @@
     content.js
 
 */
-// working last update of custom subtitle
+
 
 let subtitles = []; // Stores current subtitle data
 let originalSubtitles = []; // Stores the original subtitle data for resetting
@@ -87,11 +88,50 @@ function createSubtitleDiv() {
         subtitleDiv.style.zIndex = '10000';
         subtitleDiv.style.textAlign = 'center';
         subtitleDiv.style.padding = '8px 12px';
-        subtitleDiv.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+        subtitleDiv.style.backgroundColor = 'rgba(0, 0, 0, 0.3)';
         subtitleDiv.style.borderRadius = '5px';
         subtitleDiv.id = 'custom-subtitle';
         videoPlayer.appendChild(subtitleDiv);
     }
+}
+
+// Function to display the time difference
+function displayTimeDifference(difference) {
+    const videoPlayer = document.querySelector('.html5-video-player');
+    if (!videoPlayer) return;
+
+    // Remove any existing time difference display
+    const existingDisplay = document.getElementById('time-difference-display');
+    if (existingDisplay) {
+        existingDisplay.remove();
+    }
+
+    // Create a new div to display the time difference
+    const timeDisplayDiv = document.createElement('div');
+    timeDisplayDiv.id = 'time-difference-display';
+    timeDisplayDiv.style.position = 'absolute';
+    timeDisplayDiv.style.top = '10px';
+    timeDisplayDiv.style.left = '10px';
+    timeDisplayDiv.style.color = 'white';
+    timeDisplayDiv.style.fontSize = '16px';
+    timeDisplayDiv.style.textShadow = '1px 1px 3px black';
+    timeDisplayDiv.style.zIndex = '10000';
+    timeDisplayDiv.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+    timeDisplayDiv.style.padding = '5px 10px';
+    timeDisplayDiv.style.borderRadius = '5px';
+    timeDisplayDiv.textContent = `Subtitle Delay: ${difference.toFixed(2)}s`;
+
+    // Append the div to the video player
+    videoPlayer.appendChild(timeDisplayDiv);
+
+    // Fade out and remove the div after 1.5 seconds
+    setTimeout(() => {
+        timeDisplayDiv.style.transition = 'opacity 0.5s';
+        timeDisplayDiv.style.opacity = '0';
+        setTimeout(() => {
+            timeDisplayDiv.remove();
+        }, 500); // Remove after fade-out
+    }, 1500);
 }
 
 // Adjust subtitle font size
@@ -194,11 +234,17 @@ function adjustSubtitlesBackward() {
     currentSubtitleIndex--;
     displaySubtitle(currentSubtitleIndex);
 
+    // Display the time difference between the current subtitle's start time and its original start time
+    const originalStartTime = originalSubtitles[currentSubtitleIndex].start;
+    const currentStartTime = subtitles[currentSubtitleIndex].start;
+    const startTimeDifference = currentStartTime - originalStartTime;
+    displayTimeDifference(startTimeDifference);    
+
     // Temporarily disable syncSubtitles
     isManualAdjustment = true;
     setTimeout(() => {
         isManualAdjustment = false;
-    }, 100); // Re-enable after 1 second
+    }, 1000); // Re-enable after 1 second
 }
 
 // Adjust subtitle timings forward (manual sync)
@@ -224,12 +270,19 @@ function adjustSubtitlesForward() {
     currentSubtitleIndex++;
     displaySubtitle(currentSubtitleIndex);
 
+    // Display the time difference between the current subtitle's start time and its original start time
+    const originalStartTime = originalSubtitles[currentSubtitleIndex].start;
+    const currentStartTime = subtitles[currentSubtitleIndex].start;
+    const startTimeDifference = currentStartTime - originalStartTime;
+    displayTimeDifference(startTimeDifference);    
+
     // Temporarily disable syncSubtitles
     isManualAdjustment = true;
     setTimeout(() => {
         isManualAdjustment = false;
-    }, 100); // Re-enable after 1 second
+    }, 1000); // Re-enable after 1 second
 }
+
 
 // Adjust subtitle timings backward by 100ms
 function adjustSubtitlesBackward100ms() {
@@ -240,13 +293,40 @@ function adjustSubtitlesBackward100ms() {
 
     subtitleHistory.push(JSON.parse(JSON.stringify(subtitles))); // Save current state for undo
 
+    const video = document.querySelector('video');
+    if (!video) return;
+
+    // Find the nearest subtitle
+    let nearestSubtitleIndex = -1;
+    let minTimeDifference = Infinity;
+
+    for (let i = 0; i < subtitles.length; i++) {
+        const timeDifference = Math.abs(video.currentTime - subtitles[i].start);
+        if (timeDifference < minTimeDifference) {
+            minTimeDifference = timeDifference;
+            nearestSubtitleIndex = i;
+        }
+    }
+
+    if (nearestSubtitleIndex === -1) {
+        console.error('No nearest subtitle found.');
+        return;
+    }
+
     // Shift all subtitles backward by 100ms
     for (let i = 0; i < subtitles.length; i++) {
         subtitles[i].start += 0.1; // 100ms = 0.1 seconds
         subtitles[i].end += 0.1;
     }
 
+    currentSubtitleIndex = nearestSubtitleIndex;
     displaySubtitle(currentSubtitleIndex);
+
+    // Display the time difference between the current subtitle's start time and its original start time
+    const originalStartTime = originalSubtitles[currentSubtitleIndex].start;
+    const currentStartTime = subtitles[currentSubtitleIndex].start;
+    const startTimeDifference = currentStartTime - originalStartTime;
+    displayTimeDifference(startTimeDifference);
 
     // Temporarily disable syncSubtitles
     isManualAdjustment = true;
@@ -264,13 +344,40 @@ function adjustSubtitlesForward100ms() {
 
     subtitleHistory.push(JSON.parse(JSON.stringify(subtitles))); // Save current state for undo
 
+    const video = document.querySelector('video');
+    if (!video) return;
+
+    // Find the nearest subtitle
+    let nearestSubtitleIndex = -1;
+    let minTimeDifference = Infinity;
+
+    for (let i = 0; i < subtitles.length; i++) {
+        const timeDifference = Math.abs(video.currentTime - subtitles[i].start);
+        if (timeDifference < minTimeDifference) {
+            minTimeDifference = timeDifference;
+            nearestSubtitleIndex = i;
+        }
+    }
+
+    if (nearestSubtitleIndex === -1) {
+        console.error('No nearest subtitle found.');
+        return;
+    }
+
     // Shift all subtitles forward by 100ms
     for (let i = 0; i < subtitles.length; i++) {
         subtitles[i].start -= 0.1; // 100ms = 0.1 seconds
         subtitles[i].end -= 0.1;
     }
 
+    currentSubtitleIndex = nearestSubtitleIndex;
     displaySubtitle(currentSubtitleIndex);
+
+    // Display the time difference between the current subtitle's start time and its original start time
+    const originalStartTime = originalSubtitles[currentSubtitleIndex].start;
+    const currentStartTime = subtitles[currentSubtitleIndex].start;
+    const startTimeDifference = currentStartTime - originalStartTime;
+    displayTimeDifference(startTimeDifference);
 
     // Temporarily disable syncSubtitles
     isManualAdjustment = true;
@@ -279,6 +386,8 @@ function adjustSubtitlesForward100ms() {
     }, 1000); // Re-enable after 1 second
 }
 
+
+    
 // Undo subtitle adjustments
 function undoSubtitles() {
     if (subtitleHistory.length > 0) {
