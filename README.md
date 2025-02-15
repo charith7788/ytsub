@@ -1,7 +1,7 @@
-# ytsub
-## Youtube custom Subtitle - v 1.0.0
+# ytsub v.1.0.1
+## Youtube custom Subtitle 
 ## Description:
-You can upload subtitle to the youtube video page directly and watch videos with your subtitle files. (current version works only with .SRT Format)
+An external subtitle viewer chrome extension for youtube (current version works only with .SRT Format)
 ## Instructions:
 - Download the files in a folder.
 - Open Chrome extension manager.
@@ -24,4 +24,6 @@ You can upload subtitle to the youtube video page directly and watch videos with
 - Press U to undo changes.
 - Press R to reset changes.
 
-##  Contact : www.facebook.com/charith.dayantha for more info
+### [demo video link](https://youtu.be/8QvFef7tWUI?si=vfKJGUzi7kDkZh1r)
+
+###  Contact : [www.facebook.com/charith.dayantha](https://www.facebook.com/charith.dayantha) for more info
