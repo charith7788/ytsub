@@ -3,11 +3,12 @@
 ## Description:
 An external subtitle viewer chrome extension for youtube (current version works only with .SRT Format)
 ## Instructions:
-- Download the files in a folder.
+- Download the files.
+- Extract the compressed file.
 - Open Chrome extension manager.
 - Turn on Developer mode.
 - Click Load Unpacked
-- Select the file folder.
+- Select the file folder named ytsub.
 - Thats All.
 
 ## How to use
