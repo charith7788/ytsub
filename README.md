@@ -1,5 +1,5 @@
 # ytsub v.1.0.1
-## Youtube custom Subtitle 
+## SRT External Subtitles on Youtube videos 
 ## Description:
 An external subtitle viewer chrome extension for youtube (current version works only with .SRT Format)
 ## Instructions:
